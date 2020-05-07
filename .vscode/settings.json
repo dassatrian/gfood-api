@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/b7ea35f0-4df7-43e7-9eb4-7afaf9a8206c/resourceGroups/gfood-uat/providers/Microsoft.Web/sites/gfood-api",
+    "appService.deploySubpath": ""
+}
