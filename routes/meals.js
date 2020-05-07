@@ -8,35 +8,68 @@ let Ingredient = require("../models/ingredient.model");
 const meals_url = "https://gfood-api.azurewebsites.net/meals/";
 
 // Meal search
+// courtesy of https://github.com/nax3t/fuzzy-search/blob/master/routes/campgrounds.js
 router.route("/").get((req, res) => {
-  Meal.find()
-    .populate("ingredients.ingredient", "_id name energy hsr ghg")
-    .select("_id ingredients energy ghg hsr")
-    .then((docs) => {
-      console.log(docs);
-      res.status(200).json({
-        count: docs.length,
-        meals: docs.map((doc) => {
-          return {
-            _id: doc._id,
-            name: doc.name,
-            description: doc.description,
-            energy: doc.energy,
-            ghg: doc.ghg,
-            hsr: doc.hsr,
-            ingredients: doc.ingredients,
-            request: {
-              type: "GET",
-              url: meals_url + doc._id,
-            },
-          };
-        }),
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err });
+  // First, check if there are any query parameters
+  if (req.query.name) {
+    // regex parse on all of the query terms
+    const name = new RegExp(escapeRegex(req.query.name), "gi");
+    // perform search
+    Meal.find({ name: name }, (err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ error: err });
+      } else {
+        const response = {
+          count: docs.length,
+          meals: docs.map((doc) => {
+            return {
+              _id: doc._id,
+              name: doc.name,
+              description: doc.description,
+              energy: doc.energy,
+              ghg: doc.ghg,
+              hsr: doc.hsr,
+              ingredients: doc.ingredients,
+              request: {
+                type: "GET",
+                url: meals_url + doc._id,
+              },
+            };
+          }),
+        };
+        res.status(200).json(response);
+      }
     });
+  } else {
+    // if no query on name
+    Meal.find((err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ error: err });
+      } else {
+        const response = {
+          count: docs.length,
+          meals: docs.map((doc) => {
+            return {
+              _id: doc._id,
+              name: doc.name,
+              description: doc.description,
+              energy: doc.energy,
+              ghg: doc.ghg,
+              hsr: doc.hsr,
+              ingredients: doc.ingredients,
+              request: {
+                type: "GET",
+                url: meals_url + doc._id,
+              },
+            };
+          }),
+        };
+        res.status(200).json(response);
+      }
+    });
+  }
 });
 
 // Adding meals
@@ -136,6 +169,11 @@ router.route("/update/:id").put((req, res) => {
       });
     });
 });
+
+// Function to create a search query
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 // export this route
 module.exports = router;

@@ -8,31 +8,62 @@ const ingredients_url = "https://gfood-api.azurewebsites.net/ingredients/";
 
 // Ingredient search
 router.route("/").get((req, res) => {
-  Ingredient.find()
-    .select("name hsr ghg energy")
-    .then((docs) => {
-      const response = {
-        count: docs.length,
-        ingredients: docs.map((doc) => {
-          return {
-            name: doc.name,
-            hsr: doc.hsr,
-            ghg: doc.ghg,
-            energy: doc.energy,
-            _id: doc._id,
-            request: {
-              type: "GET",
-              url: ingredients_url + doc._id,
-            },
-          };
-        }),
-      };
-      res.status(200).json(response);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err });
+  // First, check if there are any query parameters
+  if (req.query.name) {
+    // regex parse on all of the query terms
+    const name = new RegExp(escapeRegex(req.query.name), "gi");
+    // perform search
+    Ingredient.find({ name: name }, (err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ error: err });
+      } else {
+        const response = {
+          count: docs.length,
+          ingredients: docs.map((doc) => {
+            return {
+              name: doc.name,
+              hsr: doc.hsr,
+              ghg: doc.ghg,
+              energy: doc.energy,
+              _id: doc._id,
+              request: {
+                type: "GET",
+                url: ingredients_url + doc._id,
+              },
+            };
+          }),
+        };
+        res.status(200).json(response);
+      }
     });
+  } else {
+    // if no query on name
+    Ingredient.find((err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ error: err });
+      } else {
+        const response = {
+          count: docs.length,
+          ingredients: docs.map((doc) => {
+            return {
+              name: doc.name,
+              hsr: doc.hsr,
+              ghg: doc.ghg,
+              energy: doc.energy,
+              _id: doc._id,
+              request: {
+                type: "GET",
+                url: ingredients_url + doc._id,
+              },
+            };
+          }),
+        };
+        res.status(200).json(response);
+      }
+    });
+  }
 });
 
 // Adding ingredients
@@ -134,6 +165,11 @@ router.route("/update/:id").put((req, res) => {
       });
     });
 });
+
+// Function to create a search query
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 // export this route
 module.exports = router;

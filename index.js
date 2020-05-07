@@ -36,10 +36,12 @@ mongoose
 // Route requests for /ingredients to /routes/ingredients in folder structure
 const ingredientsRouter = require("./routes/ingredients");
 const mealsRouter = require("./routes/meals");
+const marketsRouter = require("./routes/markets");
 
 // Handle incoming requests
 app.use("/ingredients", ingredientsRouter);
 app.use("/meals", mealsRouter);
+app.use("/markets", marketsRouter);
 
 // Start listening to requests
 app.listen(port, () => {
