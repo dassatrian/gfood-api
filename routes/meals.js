@@ -1,33 +1,37 @@
 // installing required packages
 const router = require("express").Router();
 const mongoose = require("mongoose");
+let Meal = require("../models/meal.model");
 let Ingredient = require("../models/ingredient.model");
 
 // url for later to surface in responses
-const ingredients_url = "https://gfood-api.azurewebsites.net/ingredients/";
+const meals_url = "https://gfood-api.azurewebsites.net/meals/";
 
-// Ingredient search
+// Meal search
 router.route("/").get((req, res) => {
-  Ingredient.find()
-    .select("name hsr ghg energy")
+  Meal.find()
+    .populate("ingredients.ingredient", "_id name energy hsr ghg")
+    .select("_id ingredients energy ghg hsr")
     .then((docs) => {
-      const response = {
+      console.log(docs);
+      res.status(200).json({
         count: docs.length,
-        ingredients: docs.map((doc) => {
+        meals: docs.map((doc) => {
           return {
-            name: doc.name,
-            hsr: doc.hsr,
-            ghg: doc.ghg,
-            energy: doc.energy,
             _id: doc._id,
+            name: doc.name,
+            description: doc.description,
+            energy: doc.energy,
+            ghg: doc.ghg,
+            hsr: doc.hsr,
+            ingredients: doc.ingredients,
             request: {
               type: "GET",
-              url: ingredients_url + doc._id,
+              url: meals_url + doc._id,
             },
           };
         }),
-      };
-      res.status(200).json(response);
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -35,38 +39,35 @@ router.route("/").get((req, res) => {
     });
 });
 
-// Adding ingredients
+// Adding meals
 router.route("/add").post((req, res) => {
-  const newIngredient = new Ingredient({
-    _id: new mongoose.Types.ObjectId(),
+  const newMeal = new Meal({
+    _id: mongoose.Types.ObjectId(),
     name: req.body.name,
     description: req.body.description,
+    ingredients: req.body.ingredients,
     hsr: req.body.hsr,
     ghg: req.body.ghg,
     energy: req.body.energy,
-    protein: req.body.protein,
-    sodium: req.body.sodium,
-    sugar: req.body.sugar,
-    saturated_fat: req.body.saturated_fat,
-    fibre: req.body.fibre,
-    product_id: req.body.product_id,
-    category_id: req.body.category_id,
-    carbohydrate: req.body.carbohydrate,
   });
-
-  newIngredient
+  return newMeal
     .save()
     .then((result) => {
       console.log(result);
       res.status(201).json({
-        message: "Ingredient Added",
-        addedIngredient: {
-          name: result.name,
+        message: "Meal Added",
+        addedMeal: {
           _id: result._id,
-          request: {
-            type: "GET",
-            url: ingredients_url + result._id,
-          },
+          name: result.name,
+          description: result.description,
+          ingredients: result.ingredients,
+          hsr: req.body.hsr,
+          ghg: req.body.ghg,
+          energy: req.body.energy,
+        },
+        request: {
+          type: "GET",
+          url: meals_url + result._id,
         },
       });
     })
@@ -76,13 +77,14 @@ router.route("/add").post((req, res) => {
     });
 });
 
-// Get an individual ingredient
+// Get an individual meal
 router.route("/:id").get((req, res) => {
-  Ingredient.findById(req.params.id)
-    .then((docs) => {
-      console.log(docs);
-      if (docs) {
-        res.status(200).json(docs);
+  Meal.findById(req.params.id)
+    .populate("ingredients.ingredient")
+    .then((doc) => {
+      console.log(doc);
+      if (doc) {
+        res.status(200).json(doc);
       } else {
         res
           .status(404)
@@ -95,12 +97,12 @@ router.route("/:id").get((req, res) => {
     });
 });
 
-// Delete an individual ingredient
+// Delete an individual meal
 router.route("/:id").delete((req, res) => {
-  Ingredient.findByIdAndDelete(req.params.id)
+  Meal.deleteOne({ _id: req.params.id })
     .then((result) => {
       res.status(200).json({
-        message: "Ingredient deleted",
+        message: "Meal deleted",
       });
     })
     .catch((err) => {
@@ -109,21 +111,21 @@ router.route("/:id").delete((req, res) => {
     });
 });
 
-// Update an individaul ingredient
+// Update an individual meal
 router.route("/update/:id").put((req, res) => {
   const updateOps = {};
   for (const ops of req.body) {
     updateOps[ops.propName] = ops.value;
   }
 
-  Ingredient.update({ _id: req.params.id }, { $set: updateOps })
+  Meal.update({ _id: req.params.id }, { $set: updateOps })
     .then((docs) => {
       console.log(docs);
       res.status(200).json({
-        message: "Ingredient updated",
+        message: "Meal updated",
         request: {
           type: "GET",
-          url: ingredients_url + req.params.id,
+          url: meals_url + req.params.id,
         },
       });
     })
