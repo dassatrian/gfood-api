@@ -23,6 +23,7 @@ router.route("/").get((req, res) => {
           ingredients: docs.map((doc) => {
             return {
               name: doc.name,
+              ingredient_type: doc.ingredient_type,
               hsr: doc.hsr,
               ghg: doc.ghg,
               energy: doc.energy,
@@ -49,6 +50,7 @@ router.route("/").get((req, res) => {
           ingredients: docs.map((doc) => {
             return {
               name: doc.name,
+              ingredient_type: doc.ingredient_type,
               hsr: doc.hsr,
               ghg: doc.ghg,
               energy: doc.energy,
@@ -71,17 +73,19 @@ router.route("/add").post((req, res) => {
   const newIngredient = new Ingredient({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
+    ingredient_type: req.body.ingredient_type,
     description: req.body.description,
-    hsr: req.body.hsr,
-    ghg: req.body.ghg,
     energy: req.body.energy,
+    hsr: req.body.hsr,
+    hsr_id: req.body.hsr_id,
+    ghg: req.body.ghg,
+    emission_id: req.body.emission_id,
     protein: req.body.protein,
     sodium: req.body.sodium,
     sugar: req.body.sugar,
     saturated_fat: req.body.saturated_fat,
     fibre: req.body.fibre,
-    product_id: req.body.product_id,
-    category_id: req.body.category_id,
+    fat: req.body.fat,
     carbohydrate: req.body.carbohydrate,
   });
 
@@ -93,6 +97,7 @@ router.route("/add").post((req, res) => {
         message: "Ingredient Added",
         addedIngredient: {
           name: result.name,
+          ingredient_type: doc.ingredient_type,
           _id: result._id,
           request: {
             type: "GET",

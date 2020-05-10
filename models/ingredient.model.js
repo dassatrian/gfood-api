@@ -1,6 +1,5 @@
 // importing required packages
 const mongoose = require("mongoose");
-const uniqueValidator = require("mongoose-unique-validator");
 
 // instantiating schema
 const Schema = mongoose.Schema;
@@ -9,27 +8,26 @@ const Schema = mongoose.Schema;
 const ingredientSchema = new Schema(
   {
     _id: Schema.Types.ObjectId,
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    ingredient_type: { type: String },
     description: { type: String },
-    hsr: { type: Number },
-    ghg: { type: Number },
     energy: { type: Number, required: true },
+    hsr: { type: Number },
+    hsr_id: { type: String },
+    ghg: { type: Number },
+    emission_id: { type: String },
     protein: { type: Number, required: true },
     sodium: { type: Number, required: true },
     sugar: { type: Number, required: true },
     saturated_fat: { type: Number, required: true },
     fibre: { type: Number, required: true },
-    product_id: { type: Number, required: true },
-    category_id: { type: String, required: true },
+    fat: { type: Number },
     carbohydrate: { type: Number },
   },
   {
     timestamps: true,
   }
 );
-
-// performing validation
-ingredientSchema.plugin(uniqueValidator);
 
 // saving the ingredient model
 const Ingredient = mongoose.model("Ingredient", ingredientSchema);
