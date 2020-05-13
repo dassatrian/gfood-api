@@ -6,66 +6,47 @@ let Ingredient = require("../models/ingredient.model");
 // url for later to surface in responses
 const ingredients_url = "https://gfood-api.azurewebsites.net/ingredients/";
 
-// Ingredient search
+// Ingredient Search
 router.route("/").get((req, res) => {
-  // First, check if there are any query parameters
-  if (req.query.name) {
-    // regex parse on all of the query terms
+  if (req.query.name && req.query.hsr) {
     const name = new RegExp(escapeRegex(req.query.name), "gi");
-    // perform search
-    Ingredient.find({ name: name }, (err, docs) => {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ error: err });
-      } else {
-        const response = {
-          count: docs.length,
-          ingredients: docs.map((doc) => {
-            return {
-              name: doc.name,
-              ingredient_type: doc.ingredient_type,
-              hsr: doc.hsr,
-              ghg: doc.ghg,
-              energy: doc.energy,
-              _id: doc._id,
-              request: {
-                type: "GET",
-                url: ingredients_url + doc._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
-      }
-    });
+    const hsr = req.query.hsr;
+    ingredient_search = { name: name, hsr: { $lte: hsr } };
+  } else if (req.query.hsr) {
+    const hsr = req.query.hsr;
+    ingredient_search = { hsr: { $lte: hsr } };
+  } else if (req.query.name) {
+    const name = new RegExp(escapeRegex(req.query.name), "gi");
+    ingredient_search = { name: name };
   } else {
-    // if no query on name
-    Ingredient.find((err, docs) => {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ error: err });
-      } else {
-        const response = {
-          count: docs.length,
-          ingredients: docs.map((doc) => {
-            return {
-              name: doc.name,
-              ingredient_type: doc.ingredient_type,
-              hsr: doc.hsr,
-              ghg: doc.ghg,
-              energy: doc.energy,
-              _id: doc._id,
-              request: {
-                type: "GET",
-                url: ingredients_url + doc._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
-      }
-    });
+    ingredient_search = {};
   }
+
+  Ingredient.find(ingredient_search, (err, docs) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: err });
+    } else {
+      const response = {
+        count: docs.length,
+        ingredients: docs.map((doc) => {
+          return {
+            name: doc.name,
+            ingredient_type: doc.ingredient_type,
+            hsr: doc.hsr,
+            ghg: doc.ghg,
+            energy: doc.energy,
+            _id: doc._id,
+            request: {
+              type: "GET",
+              url: ingredients_url + doc._id,
+            },
+          };
+        }),
+      };
+      res.status(200).json(response);
+    }
+  });
 });
 
 // Adding ingredients
