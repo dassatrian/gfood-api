@@ -79,6 +79,8 @@ router.route("/").get((req, res) => {
               name: doc.name,
               suburb: doc.suburb,
               business_category: doc.business_category,
+              lon: doc.lon,
+              lat: doc.lat,
               request: {
                 type: "GET",
                 url: markets_url + doc._id,
@@ -104,6 +106,8 @@ router.route("/").get((req, res) => {
               name: doc.name,
               suburb: doc.suburb,
               business_category: doc.business_category,
+              lon: doc.lon,
+              lat: doc.lat,
               request: {
                 type: "GET",
                 url: markets_url + doc._id,
@@ -137,33 +141,6 @@ router.route("/:id").get((req, res) => {
 });
 
 // Find 5 closest markets --> NOT READY YET
-router.route("/near_me").get((req, res) => {
-  Market.find()
-    .select("name hsr ghg energy")
-    .then((docs) => {
-      const response = {
-        count: docs.length,
-        ingredients: docs.map((doc) => {
-          return {
-            name: doc.name,
-            hsr: doc.hsr,
-            ghg: doc.ghg,
-            energy: doc.energy,
-            _id: doc._id,
-            request: {
-              type: "GET",
-              url: ingredients_url + doc._id,
-            },
-          };
-        }),
-      };
-      res.status(200).json(response);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
-});
 
 // Function to create a search query
 function escapeRegex(text) {
