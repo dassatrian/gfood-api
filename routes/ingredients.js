@@ -78,7 +78,7 @@ router.route("/add").post((req, res) => {
         message: "Ingredient Added",
         addedIngredient: {
           name: result.name,
-          ingredient_type: doc.ingredient_type,
+          ingredient_type: result.ingredient_type,
           _id: result._id,
           request: {
             type: "GET",

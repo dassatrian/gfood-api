@@ -94,9 +94,9 @@ router.route("/add").post((req, res) => {
           name: result.name,
           description: result.description,
           ingredients: result.ingredients,
-          hsr: req.body.hsr,
-          ghg: req.body.ghg,
-          energy: req.body.energy,
+          hsr: result.hsr,
+          ghg: result.ghg,
+          energy: result.energy,
         },
         request: {
           type: "GET",
