@@ -6,7 +6,7 @@ let Market = require("../models/market.model");
 // url for later to surface in responses
 const markets_url = "https://gfood-api.azurewebsites.net/markets/";
 
-// Adding markets --> FOR TEST ONLY!
+// Adding markets --> FOR DATA LOADING ONLY!
 router.route("/add").post((req, res) => {
   const newMarket = new Market({
     _id: new mongoose.Types.ObjectId(),
@@ -139,8 +139,6 @@ router.route("/:id").get((req, res) => {
       res.status(500).json({ error: err });
     });
 });
-
-// Find 5 closest markets --> NOT READY YET
 
 // Function to create a search query
 function escapeRegex(text) {

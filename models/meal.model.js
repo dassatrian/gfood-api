@@ -9,7 +9,7 @@ const Schema = mongoose.Schema;
 const mealSchema = new Schema(
   {
     _id: Schema.Types.ObjectId,
-    name: { type: String, required: true, unique: true },
+    name: { type: String, unique: true },
     description: { type: String },
     energy: { type: Number },
     ghg: { type: Number },
@@ -19,7 +19,6 @@ const mealSchema = new Schema(
         ingredient: {
           type: Schema.Types.ObjectId,
           ref: "Ingredient",
-          required: true,
         },
         quantity: { type: Number, default: 1 },
       },

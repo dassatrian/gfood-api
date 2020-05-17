@@ -9,7 +9,7 @@ const Schema = mongoose.Schema;
 const marketSchema = new Schema(
   {
     _id: Schema.Types.ObjectId,
-    name: { type: String, required: true, unique: true },
+    name: { type: String, unique: true },
     address: { type: String },
     suburb: { type: String },
     postcode: { type: Number },
@@ -17,8 +17,8 @@ const marketSchema = new Schema(
     business_category: { type: String },
     lga: { type: String },
     region: { type: String },
-    lon: { type: Number, required: true },
-    lat: { type: Number, required: true },
+    lon: { type: Number },
+    lat: { type: Number },
   },
   {
     timestamps: true,

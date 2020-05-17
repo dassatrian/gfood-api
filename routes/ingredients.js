@@ -7,6 +7,7 @@ let Ingredient = require("../models/ingredient.model");
 const ingredients_url = "https://gfood-api.azurewebsites.net/ingredients/";
 
 // Ingredient Search
+// courtesy of https://github.com/nax3t/fuzzy-search/blob/master/routes/campgrounds.js
 router.route("/").get((req, res) => {
   if (req.query.name && req.query.hsr) {
     const name = new RegExp(escapeRegex(req.query.name), "gi");
@@ -22,7 +23,7 @@ router.route("/").get((req, res) => {
     ingredient_search = {};
   }
 
-  Ingredient.find(ingredient_search, (err, docs) => {
+  Ingredient.find(ingredient_search).exec((err, docs) => {
     if (err) {
       console.log(err);
       res.status(500).json({ error: err });

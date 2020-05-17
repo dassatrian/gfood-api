@@ -7,69 +7,49 @@ let Ingredient = require("../models/ingredient.model");
 // url for later to surface in responses
 const meals_url = "https://gfood-api.azurewebsites.net/meals/";
 
-// Meal search
+// Meal Search
 // courtesy of https://github.com/nax3t/fuzzy-search/blob/master/routes/campgrounds.js
 router.route("/").get((req, res) => {
-  // First, check if there are any query parameters
-  if (req.query.name) {
-    // regex parse on all of the query terms
+  if (req.query.name && req.query.hsr) {
     const name = new RegExp(escapeRegex(req.query.name), "gi");
-    // perform search
-    Meal.find({ name: name }, (err, docs) => {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ error: err });
-      } else {
-        const response = {
-          count: docs.length,
-          meals: docs.map((doc) => {
-            return {
-              _id: doc._id,
-              name: doc.name,
-              description: doc.description,
-              energy: doc.energy,
-              ghg: doc.ghg,
-              hsr: doc.hsr,
-              ingredients: doc.ingredients,
-              request: {
-                type: "GET",
-                url: meals_url + doc._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
-      }
-    });
+    const hsr = req.query.hsr;
+    meal_search = { name: name, hsr: { $lte: hsr } };
+  } else if (req.query.hsr) {
+    const hsr = req.query.hsr;
+    meal_search = { hsr: { $lte: hsr } };
+  } else if (req.query.name) {
+    const name = new RegExp(escapeRegex(req.query.name), "gi");
+    meal_search = { name: name };
   } else {
-    // if no query on name
-    Meal.find((err, docs) => {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ error: err });
-      } else {
-        const response = {
-          count: docs.length,
-          meals: docs.map((doc) => {
-            return {
-              _id: doc._id,
-              name: doc.name,
-              description: doc.description,
-              energy: doc.energy,
-              ghg: doc.ghg,
-              hsr: doc.hsr,
-              ingredients: doc.ingredients,
-              request: {
-                type: "GET",
-                url: meals_url + doc._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
-      }
-    });
+    meal_search = {};
   }
+
+  Meal.find(meal_search).exec((err, docs) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: err });
+    } else {
+      const response = {
+        count: docs.length,
+        meals: docs.map((doc) => {
+          return {
+            _id: doc._id,
+            name: doc.name,
+            description: doc.description,
+            energy: doc.energy,
+            ghg: doc.ghg,
+            hsr: doc.hsr,
+            ingredients: doc.ingredients,
+            request: {
+              type: "GET",
+              url: meals_url + doc._id,
+            },
+          };
+        }),
+      };
+      res.status(200).json(response);
+    }
+  });
 });
 
 // Adding meals
