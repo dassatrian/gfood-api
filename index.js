@@ -24,6 +24,7 @@ mongoose
     {
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      useCreateIndex: true,
       auth: {
         user: process.env.COSMODDB_USER,
         password: process.env.COSMOSDB_PASSWORD,

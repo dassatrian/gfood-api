@@ -29,6 +29,9 @@ const ingredientSchema = new Schema(
   }
 );
 
+// create the schema index to optimise searching later on
+ingredientSchema.index({ name: 1, hsr: -1, ghg: 1 });
+
 // saving the ingredient model
 const Ingredient = mongoose.model("Ingredient", ingredientSchema);
 

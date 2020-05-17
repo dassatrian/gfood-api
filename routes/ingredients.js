@@ -27,37 +27,39 @@ router.route("/").get((req, res) => {
     ingredient_search = {}; // construct the search, get all results
   }
 
-  Ingredient.find(ingredient_search).exec((err, docs) => {
-    // perform the search, based on queries constructed prior
-    if (err) {
-      // handle errors
-      console.log(err);
-      res.status(500).json({ error: err }); // 500 response (internal error) with a JSON object containing the error code
-    } else {
-      // handle happy path
-      const response = {
-        // construct a response based on the matches of the search
-        count: docs.length, // give a count of all the ingredients that match the search
-        ingredients: docs.map((doc) => {
-          // return back a cut-down version of the ingredient model so it is easier on the front-end
-          return {
-            name: doc.name, // name of the ingredient
-            ingredient_type: doc.ingredient_type, // type of ingredient
-            hsr: doc.hsr, // health star rating of the ingredient (between 0.5 and 5)
-            ghg: doc.ghg, // greenhouse gas emissions of the ingredient (in kgCO2/100g)
-            energy: doc.energy, // energy of the ingredient (in kJ)
-            _id: doc._id, // mongo id of the ingredient
-            request: {
-              // friendly url to access the full model of the ingredient
-              type: "GET",
-              url: ingredients_url + doc._id,
-            },
-          };
-        }),
-      };
-      res.status(200).json(response);
-    }
-  });
+  Ingredient.find(ingredient_search)
+    .sort({ hsr: -1, ghg: 1 }) // sort health star rating in descending order and greenhouse gasses in ascending order to prioritise healthier foods
+    .exec((err, docs) => {
+      // perform the search, based on queries constructed prior
+      if (err) {
+        // handle errors
+        console.log(err);
+        res.status(500).json({ error: err }); // 500 response (internal error) with a JSON object containing the error code
+      } else {
+        // handle happy path
+        const response = {
+          // construct a response based on the matches of the search
+          count: docs.length, // give a count of all the ingredients that match the search
+          ingredients: docs.map((doc) => {
+            // return back a cut-down version of the ingredient model so it is easier on the front-end
+            return {
+              name: doc.name, // name of the ingredient
+              ingredient_type: doc.ingredient_type, // type of ingredient
+              hsr: doc.hsr, // health star rating of the ingredient (between 0.5 and 5)
+              ghg: doc.ghg, // greenhouse gas emissions of the ingredient (in kgCO2/100g)
+              energy: doc.energy, // energy of the ingredient (in kJ)
+              _id: doc._id, // mongo id of the ingredient
+              request: {
+                // friendly url to access the full model of the ingredient
+                type: "GET",
+                url: ingredients_url + doc._id,
+              },
+            };
+          }),
+        };
+        res.status(200).json(response);
+      }
+    });
 });
 
 // Adding ingredients
