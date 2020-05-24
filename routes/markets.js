@@ -91,8 +91,13 @@ router.route("/").get((req, res) => {
             return {
               _id: doc._id, // mongo id of the market
               name: doc.name, // name of the market
+              address: doc.address, // address of the market
               suburb: doc.suburb, // suburb of the market
-              business_category: doc.business_category, // business category of the market
+              postcode: doc.postcode, // postcode of the market
+              state: doc.state, // state of the market
+              business_category: doc.business_category, // business_category of the market
+              lga: doc.lga, // local area of the market
+              region: doc.region, // region of the market
               lon: doc.lon, // longitude of the market
               lat: doc.lat, // latitude of the market
               request: {
@@ -117,12 +122,17 @@ router.route("/").get((req, res) => {
           count: docs.length,
           markets: docs.map((doc) => {
             return {
-              _id: doc._id,
-              name: doc.name,
-              suburb: doc.suburb,
-              business_category: doc.business_category,
-              lon: doc.lon,
-              lat: doc.lat,
+              _id: doc._id, // mongo id of the market
+              name: doc.name, // name of the market
+              address: doc.address, // address of the market
+              suburb: doc.suburb, // suburb of the market
+              postcode: doc.postcode, // postcode of the market
+              state: doc.state, // state of the market
+              business_category: doc.business_category, // business_category of the market
+              lga: doc.lga, // local area of the market
+              region: doc.region, // region of the market
+              lon: doc.lon, // longitude of the market
+              lat: doc.lat, // latitude of the market
               request: {
                 type: "GET",
                 url: markets_url + doc._id,
